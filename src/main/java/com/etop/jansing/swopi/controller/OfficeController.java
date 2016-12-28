@@ -132,7 +132,7 @@ public class OfficeController {
     }
 
 
-//    private static String owaServerPath = "http://officewebapps.etop.com";
+    //    private static String owaServerPath = "http://officewebapps.etop.com";
     private static String callbackServletPath = "/wopi/files";
 
     private static String getOwaUrl(String fileId, String fileExt, String curContextPath) {
