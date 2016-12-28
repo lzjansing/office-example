@@ -65,9 +65,6 @@ public class OfficeController {
         } catch (FileNotFoundException e) {
             logger.error("convert server请求文件时文件不存在！");
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            //todo return null or return new HashMap();
-            map.put("test", "testt");
-//            return map;
         } finally {
             try {
                 if (in != null) {
@@ -124,39 +121,46 @@ public class OfficeController {
      *
      * @return
      */
-    @RequestMapping("/view/{fileId}")
-    public String view(@PathVariable String fileId, HttpServletRequest req) {
+    @RequestMapping("/view")
+    public String view(HttpServletRequest req) {
 //        String redirectPath = "http://officewebapps.etop.com/wv/wordviewerframe.aspx?WOPISrc=http%3A%2F%2F192.168.1.106%3A8080%2FtestWOPI-1.0-SNAPSHOT%2Fwopi%2Ffiles%2F"+fileId;
-        return "redirect:" + getOwaUrl(fileId,
-                FilenameUtils.getExtension(ExampleController.getFilePath(fileId)),
+        String fileId = req.getParameter("fileId");
+        String owaServerPath = req.getParameter("owaServerPath");
+        return "redirect:" + owaServerPath + getOwaUrl(fileId,
+                FilenameUtils.getExtension(ExampleController.getFilePath(fileId, req)),
                 HttpClientUtil.getLocalServerPath(req));
     }
 
 
-    private static String owaServerPath = "http://officewebapps.etop.com";
+//    private static String owaServerPath = "http://officewebapps.etop.com";
     private static String callbackServletPath = "/wopi/files";
+
     private static String getOwaUrl(String fileId, String fileExt, String curContextPath) {
         String fileInfoServletPath = curContextPath + callbackServletPath + "/" + fileId;
 
         Map<String, String> params = Maps.newHashMap();
         params.put("WOPISrc", fileInfoServletPath);
 
-        String url = owaServerPath;
+        String url = "";
+//        String url = owaServerPath;
         if (StringUtils.isBlank(fileExt)) {
             throw new IllegalArgumentException("文件格式为空！");
         }
         switch (fileExt) {
-            case "doc":case "docx":
+            case "doc":
+            case "docx":
                 url += "/wv/wordviewerframe.aspx";
                 break;
-            case "xls":case "xlsx":
+            case "xls":
+            case "xlsx":
                 url += "/x/_layouts/xlviewerinternal.aspx";
                 break;
             case "pdf":
                 params.put("PdfMode", "1");
                 url += "/wv/wordviewerframe.aspx";
                 break;
-            case "ppt":case "pptx":
+            case "ppt":
+            case "pptx":
                 params.put("PowerPointView", "ReadingView");
                 url += "/p/PowerPointFrame.aspx";
                 break;

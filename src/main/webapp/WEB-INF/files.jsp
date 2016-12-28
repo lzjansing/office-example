@@ -16,15 +16,34 @@
 </head>
 <body style="align-content:center">
 index从0开始，
+<table>
+    <tr><th>file</th><th>ConvertServer ON</th><th>OFF</th></tr>
 <c:forEach items="${fileList}" var="file" varStatus="status">
+    <tr>
+        <td>${file}</td>
     <c:choose>
         <c:when test="${fn:contains(file, '.')}">
-            <a href="${ctx}/view?fileId=${status.index}" target="_blank">index=${status.index} - ${file}</a>
+            <td><a href="${ctx}/view?fileId=${status.index}" target="_blank">- ON -</a></td>
+            <td><a href="javascript:void(0);" onclick="callowa(${status.index});" target="_blank">- OFF -</a></td>
         </c:when>
         <c:otherwise>
-            ${file}
         </c:otherwise>
-    </c:choose><br/>
+    </c:choose>
+    </tr>
 </c:forEach>
+</table>
+<form id="owaform" action="${ctx}/wopi/files/view">
+    <input type="hidden" name="fileId" id="fileId"/>
+    <input type="text" name="owaServerPath" value="http://owa.etop.edu.cn"/>
+</form>
+<script type="application/javascript">
+    function callowa(fileId){
+        var fileInput = document.getElementById("fileId");
+        fileInput.value=fileId;
+        var owaform = document.getElementById("owaform");
+        owaform.submit();
+        return false;
+    }
+</script>
 </body>
 </html>

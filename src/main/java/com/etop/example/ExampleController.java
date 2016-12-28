@@ -21,10 +21,11 @@ import java.util.Map;
  */
 @Controller
 public class ExampleController {
-    private static List<String> fileList = new ArrayList<>(32);
+    private static List<String> fileList = null;
 
-    static {
-        File file = new File("/home/jansing/learn/java/swopi/target/swopi/upload");
+    private static void initFileList(HttpServletRequest req) {
+        fileList = new ArrayList<>(32);
+        File file = new File(req.getSession().getServletContext().getRealPath("/upload"));
         fileList.add(file.getAbsolutePath());
         List<File> tmpList = new ArrayList<>(32);
         Collections.addAll(tmpList, file.listFiles());
@@ -38,18 +39,31 @@ public class ExampleController {
     }
 
     @RequestMapping(value = {"", "/", "/files"}, method = RequestMethod.GET)
-    public String getFileList(Model model) {
-        model.addAttribute("fileList", fileList);
+    public String getFileList(Model model, HttpServletRequest req) {
+        if (fileList == null) {
+            initFileList(req);
+        }
+        if (model != null) {
+            model.addAttribute("fileList", fileList);
+        }
         return "/files";
     }
 
-    public static String getFilePath(String i) {
+    public static String getFilePath(String i, HttpServletRequest req) {
+        if (req != null && fileList == null) {
+            initFileList(req);
+        }
         String absoPath = fileList.get(Integer.parseInt(i));
         return absoPath.substring(absoPath.indexOf("/upload"));
     }
 
+    public static String getFilePath(String i) {
+        return getFilePath(i, null);
+    }
+
     private String convertServer = "http://127.0.0.1:8098/libre";
     private String servletPath = "/view";
+
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public String view(String fileId, HttpServletResponse resp, HttpServletRequest req) throws Exception {
         resp.setCharacterEncoding("UTF-8");

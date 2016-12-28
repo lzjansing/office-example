@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -305,7 +304,7 @@ public class HttpClientUtil {
         }
     }
 
-    public static String encodeParams(Map<String, String> params){
+    public static String encodeParams(Map<String, String> params) {
         if (params != null && !params.isEmpty()) {
             List<NameValuePair> pairs = new ArrayList<>(params.size());
             for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -323,7 +322,7 @@ public class HttpClientUtil {
         return "";
     }
 
-    public static String getLocalServerPath(HttpServletRequest req){
+    public static String getLocalServerPath(HttpServletRequest req) {
         String requestURL = req.getRequestURL().toString();
         String servletPath = req.getServletPath();
         return requestURL.substring(0, requestURL.indexOf(servletPath));
