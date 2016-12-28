@@ -23,7 +23,7 @@ index从0开始，
         <td>${file}</td>
     <c:choose>
         <c:when test="${fn:contains(file, '.')}">
-            <td><a href="${ctx}/view?fileId=${status.index}" target="_blank">- ON -</a></td>
+            <td><a href="javascript:void(0);" onclick="callcovert(${status.index});" target="_blank">- ON -</a></td>
             <td><a href="javascript:void(0);" onclick="callowa(${status.index});" target="_blank">- OFF -</a></td>
         </c:when>
         <c:otherwise>
@@ -32,16 +32,27 @@ index从0开始，
     </tr>
 </c:forEach>
 </table>
-<form id="owaform" action="${ctx}/wopi/files/view">
+<form id="callform" action="">
     <input type="hidden" name="fileId" id="fileId"/>
-    <input type="text" name="owaServerPath" value="http://owa.etop.edu.cn"/>
+    ON ：<input type="text" name="convertServletPath" value="http://127.0.0.1:8098/libre/view"/>
+    OFF：<input type="text" name="owaServerPath" value="http://owa.etop.edu.cn"/>
 </form>
 <script type="application/javascript">
     function callowa(fileId){
         var fileInput = document.getElementById("fileId");
         fileInput.value=fileId;
-        var owaform = document.getElementById("owaform");
-        owaform.submit();
+        var callform = document.getElementById("callform");
+        callform.action="${ctx}/wopi/files/view";
+        callform.submit();
+        return false;
+    }
+    function callcovert(fileId){
+        var fileInput = document.getElementById("fileId");
+        fileInput.value=fileId;
+        var callform = document.getElementById("callform");
+        callform.action="${ctx}/view";
+        callform.method="get";
+        callform.submit();
         return false;
     }
 </script>
