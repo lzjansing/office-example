@@ -66,7 +66,6 @@ public class ExampleController {
 
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public String view(String fileId, HttpServletResponse resp, HttpServletRequest req) throws Exception {
-        resp.setCharacterEncoding("UTF-8");
         String convertServletPath = req.getParameter("convertServletPath");
         String callbackAddr = HttpClientUtil.getLocalServerPath(req);
         Map<String, String> params = Maps.newHashMap();

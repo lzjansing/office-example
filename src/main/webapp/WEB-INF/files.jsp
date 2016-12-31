@@ -17,14 +17,14 @@
 <body style="align-content:center">
 index从0开始，
 <table>
-    <tr><th>file</th><th>ConvertServer ON</th><th>OFF</th></tr>
+    <tr><th>file</th><th>- LINUX -</th><th>- WINDOWS -</th></tr>
 <c:forEach items="${fileList}" var="file" varStatus="status">
     <tr>
         <td>${file}</td>
     <c:choose>
-        <c:when test="${fn:contains(file, '.')}">
-            <td><a href="javascript:void(0);" onclick="callcovert(${status.index});" target="_blank">- ON -</a></td>
-            <td><a href="javascript:void(0);" onclick="callowa(${status.index});" target="_blank">- OFF -</a></td>
+        <c:when test="${fn:contains(fn:substring(file, fn:length(file)-5, fn:length(file)), '.')}">
+            <td><a href="javascript:void(0);" onclick="callcovert(${status.index});">- LINUX -</a></td>
+            <td><a href="javascript:void(0);" onclick="callowa(${status.index});">- WINDOWS -</a></td>
         </c:when>
         <c:otherwise>
         </c:otherwise>
@@ -32,10 +32,11 @@ index从0开始，
     </tr>
 </c:forEach>
 </table>
+<br/>
 <form id="callform" action="">
     <input type="hidden" name="fileId" id="fileId"/>
-    ON ：<input type="text" name="convertServletPath" value="http://127.0.0.1:8098/libre/view"/>
-    OFF：<input type="text" name="owaServerPath" value="http://owa.etop.edu.cn"/>
+    LINUX ：<input type="text" name="convertServletPath" value="http://127.0.0.1:8098/libre/view"/><br/>
+    WINDOWS：<input type="text" name="owaServerPath" value="http://owa.etop.edu.cn"/><br/>
 </form>
 <script type="application/javascript">
     function callowa(fileId){
