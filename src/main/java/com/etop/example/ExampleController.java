@@ -1,6 +1,7 @@
 package com.etop.example;
 
 import com.etop.jansing.swopi.utils.HttpClientUtil;
+import com.etop.jansing.swopi.utils.SwopiUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
@@ -72,6 +73,14 @@ public class ExampleController {
         params.put("fileId", fileId);
         params.put("host", callbackAddr);
         params.put("fileExt", FilenameUtils.getExtension(getFilePath(fileId)));
+
+        String os = req.getParameter("os");
+        if(os!=null){
+            params.put("os", os);
+        }else if(".xls".equals(getFilePath(fileId))||".xlsx".equals(getFilePath(fileId))){
+            //如果是xls文档，默认用win转换平台
+            params.put("os", SwopiUtil.OS_WIN);
+        }
         return "redirect:" + convertServletPath + HttpClientUtil.encodeParams(params);
     }
 }

@@ -17,7 +17,8 @@ import java.util.Date;
  */
 public class SwopiUtil {
 
-    private static final String ENC_KEY = "Linux";
+    public static final String OS_LINUX = "linux";
+    public static final String OS_WIN = "win";
     private static final String DATE_FORMAT_STRING = "yyyy-MM-ddHH:mm:ss";
     public static final String ENCODE_CHARACTERSET = "UTF-8"; // 编码字符集
     public static final long TIME_OUT = 5 * 60 * 1000;
