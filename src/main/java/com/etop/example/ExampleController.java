@@ -77,7 +77,7 @@ public class ExampleController {
         String os = req.getParameter("os");
         if(os!=null){
             params.put("os", os);
-        }else if(".xls".equals(getFilePath(fileId))||".xlsx".equals(getFilePath(fileId))){
+        }else if(getFilePath(fileId).endsWith(".xls")||getFilePath(fileId).equals(".xlsx")){
             //如果是xls文档，默认用win转换平台
             params.put("os", SwopiUtil.OS_WIN);
         }
