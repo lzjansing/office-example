@@ -62,9 +62,6 @@ public class ExampleController {
         return getFilePath(i, null);
     }
 
-//    private String convertServer = "http://127.0.0.1:8098/libre";
-//    private String servletPath = "/view";
-
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public String view(String fileId, HttpServletResponse resp, HttpServletRequest req) throws Exception {
         String convertServletPath = req.getParameter("convertServletPath");
