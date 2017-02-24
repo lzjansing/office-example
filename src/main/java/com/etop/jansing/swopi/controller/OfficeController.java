@@ -81,10 +81,10 @@ public class OfficeController {
     }
 
     @RequestMapping("/{fileId}/contents")
-    public void fileInputStream(@PathVariable String fileId, HttpSession session, HttpServletResponse resp) {
+    public void fileInputStream(@PathVariable String fileId, HttpServletRequest req, HttpServletResponse resp) {
         InputStream in = null;
         try {
-            String realPath = session.getServletContext().getRealPath(ExampleController.getFilePath(fileId));
+            String realPath = ExampleController.getFilePath(fileId, req);
             in = new FileInputStream(new File(realPath));
             resp.setContentType("application/octet-stream");
             org.apache.commons.io.IOUtils.copy(in, resp.getOutputStream());

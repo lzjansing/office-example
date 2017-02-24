@@ -97,8 +97,7 @@ public class ExampleController {
     @ResponseBody
     @RequestMapping(value = "/uploadAjax", method = RequestMethod.POST)
     public Message uploadAjax(@RequestParam CommonsMultipartFile file, HttpServletRequest req) throws IOException {
-        System.out.println(HttpClientUtil.getLocalServerPath(req));
-        String currentServerPath = "http://127.0.0.1:8089/";
+        String currentServerPath = HttpClientUtil.getLocalServerPath(req);
         Message message = new Message();
         try {
             String filePath = FileTransmitUtil.upload(file, req, "/upload");
@@ -123,12 +122,17 @@ public class ExampleController {
     public Message exist(@RequestParam String filePath, HttpServletRequest req){
         Message message = new Message();
         if(StringUtil.isNotBlank(filePath)){
-            if(new File(FileTransmitUtil.getAbsolutePath(req, filePath)).exists()){
-                message.setCode(Message.SUCCESS);
-                message.setMessage("文件存在");
-            }else{
+            try {
+                if (new File(FileTransmitUtil.getAbsolutePath(req, filePath)).exists()) {
+                    message.setCode(Message.SUCCESS);
+                    message.setMessage("文件存在");
+                } else {
+                    message.setCode(Message.FAIL);
+                    message.setMessage("文件不存在");
+                }
+            }catch(IllegalArgumentException e){
                 message.setCode(Message.FAIL);
-                message.setMessage("文件不存在");
+                message.setMessage(e.getMessage());
             }
         }else{
             message.setCode(Message.FAIL);
