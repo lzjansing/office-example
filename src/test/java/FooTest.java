@@ -1,9 +1,15 @@
 import com.etop.example.ExampleController;
 import com.etop.jansing.swopi.utils.SwopiUtil;
+import com.jansing.common.mapper.JsonMapper;
+import com.jansing.common.utils.Message;
+import com.jansing.web.utils.HttpClientUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by jansing on 16-12-21.
@@ -80,5 +86,19 @@ public class FooTest {
         }
     }
 
+    @Test
+    public void test07() throws IOException {
+        HttpClientUtil httpClientUtil = new HttpClientUtil(false, null, 600000);
+        String url = "http://127.0.0.1:8098/libre/uploadAjax";
+        System.out.println(url);
+        String filename = "/home/jansing/learn/java/swopi/src/main/webapp/upload/pdf/3.pdf";
+        System.out.println(httpClientUtil.doPostFile(url, new File(filename)));
+    }
 
+    @Test
+    public void test08(){
+        String json = "{\"code\":\"success\",\"message\":\"上传成功\",\"extra\":{\"path\":\"http://127.0.0.1:8089//upload/3.pdf\"}}";
+        Message message = (Message) JsonMapper.fromJsonString(json, Message.class);
+        System.out.println(message);
+    }
 }

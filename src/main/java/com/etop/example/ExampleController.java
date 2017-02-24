@@ -1,15 +1,22 @@
 package com.etop.example;
 
-import com.etop.jansing.swopi.utils.HttpClientUtil;
-import com.etop.jansing.swopi.utils.SwopiUtil;
-import com.google.common.collect.Maps;
-import org.apache.commons.io.FilenameUtils;
+import com.jansing.common.utils.Message;
+import com.jansing.web.utils.FileTransmitUtil;
+import com.jansing.web.utils.StringUtil;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import com.etop.jansing.swopi.utils.SwopiUtil;
+import com.google.common.collect.Maps;
+import com.jansing.web.utils.HttpClientUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.ui.Model;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
@@ -55,11 +62,16 @@ public class ExampleController {
             initFileList(req);
         }
         String absoPath = fileList.get(Integer.parseInt(i));
-        return absoPath.substring(absoPath.indexOf("/upload"));
+        return absoPath;
     }
 
     public static String getFilePath(String i) {
         return getFilePath(i, null);
+    }
+
+    public static String getFileRelativePath(String i, HttpServletRequest req){
+        String absoPath = getFilePath(i, req);
+        return absoPath.substring(absoPath.indexOf("/upload"));
     }
 
     @RequestMapping(value = "/view", method = RequestMethod.GET)
@@ -69,15 +81,60 @@ public class ExampleController {
         Map<String, String> params = Maps.newHashMap();
         params.put("fileId", fileId);
         params.put("host", callbackAddr);
-        params.put("fileExt", FilenameUtils.getExtension(getFilePath(fileId)));
+        String fileExt = FilenameUtils.getExtension(getFilePath(fileId, req));
+        params.put("fileExt", fileExt);
 
         String os = req.getParameter("os");
         if(os!=null){
             params.put("os", os);
-        }else if(getFilePath(fileId).endsWith(".xls")||getFilePath(fileId).equals(".xlsx")){
+        }else if(fileExt.endsWith("xls")||fileExt.equals("xlsx")){
             //如果是xls文档，默认用win转换平台
             params.put("os", SwopiUtil.OS_WIN);
         }
         return "redirect:" + convertServletPath + HttpClientUtil.encodeParams(params);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/uploadAjax", method = RequestMethod.POST)
+    public Message uploadAjax(@RequestParam CommonsMultipartFile file, HttpServletRequest req) throws IOException {
+        System.out.println(HttpClientUtil.getLocalServerPath(req));
+        String currentServerPath = "http://127.0.0.1:8089/";
+        Message message = new Message();
+        try {
+            String filePath = FileTransmitUtil.upload(file, req, "/upload");
+            message.setCode(Message.SUCCESS);
+            message.setMessage("上传成功");
+            message.getExtra().put(FileTransmitUtil.PATH_KEY, currentServerPath+filePath);
+            //html的id，用以回显
+            String id = req.getParameter("id");
+            if (StringUtil.isNotBlank(id)) {
+                message.getExtra().put("id", id);
+            }
+        } catch (Exception e) {
+            message.setCode(Message.FAIL);
+            message.setMessage("上传失败，"+e.getMessage());
+        }
+        return message;
+
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/askExist", method = {RequestMethod.GET,RequestMethod.POST})
+    public Message exist(@RequestParam String filePath, HttpServletRequest req){
+        Message message = new Message();
+        if(StringUtil.isNotBlank(filePath)){
+            if(new File(FileTransmitUtil.getAbsolutePath(req, filePath)).exists()){
+                message.setCode(Message.SUCCESS);
+                message.setMessage("文件存在");
+            }else{
+                message.setCode(Message.FAIL);
+                message.setMessage("文件不存在");
+            }
+        }else{
+            message.setCode(Message.FAIL);
+            message.setMessage("参数不正确：filePath="+filePath);
+//            logger.error("请求失败，参数不正确：filePath="+filePath);
+        }
+        return message;
     }
 }

@@ -1,10 +1,11 @@
 package com.etop.jansing.swopi.controller;
 
 import com.etop.example.ExampleController;
-import com.etop.jansing.swopi.utils.HttpClientUtil;
-import com.etop.jansing.swopi.utils.JsonMapper;
 import com.etop.jansing.swopi.utils.SwopiUtil;
 import com.google.common.collect.Maps;
+import com.jansing.common.mapper.JsonMapper;
+import com.jansing.web.utils.FileTransmitUtil;
+import com.jansing.web.utils.HttpClientUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,12 +48,12 @@ public class OfficeController {
      * @throws IOException
      */
     @RequestMapping("/{fileId}")
-    public void fileInfo(@PathVariable String fileId, HttpSession session, HttpServletResponse resp) throws IOException {
+    public void fileInfo(@PathVariable String fileId, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Map<String, Object> map = new HashMap<>();
 
         InputStream in = null;
         try {
-            String realPath = session.getServletContext().getRealPath(ExampleController.getFilePath(fileId));
+            String realPath = ExampleController.getFilePath(fileId, req);
             File file = new File(realPath);
             in = new FileInputStream(file);
             map.put("BaseFileName", file.getName());
