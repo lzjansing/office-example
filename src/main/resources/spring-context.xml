@@ -11,7 +11,7 @@
     <!-- 打开Spring的Annotation支持 -->
     <context:annotation-config/>
     <!-- 设定Spring 去哪些包中找Annotation -->
-    <context:component-scan base-package="com">
+    <context:component-scan base-package="com.etop">
         <!--通过exclude-filter 把所有 @Controller注解的表现层控制器组件排除-->
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>

@@ -1,6 +1,6 @@
 package com.etop.example;
 
-import com.etop.jansing.swopi.utils.HttpClientUtil;
+import com.jansing.web.utils.HttpClientUtil;
 import com.etop.jansing.swopi.utils.SwopiUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FilenameUtils;
@@ -55,11 +55,16 @@ public class ExampleController {
             initFileList(req);
         }
         String absoPath = fileList.get(Integer.parseInt(i));
-        return absoPath.substring(absoPath.indexOf("/upload"));
+        return absoPath;
     }
 
     public static String getFilePath(String i) {
         return getFilePath(i, null);
+    }
+
+    public static String getFileRelativePath(String i, HttpServletRequest req){
+        String absoPath = getFilePath(i, req);
+        return absoPath.substring(absoPath.indexOf("/upload"));
     }
 
     @RequestMapping(value = "/view", method = RequestMethod.GET)
@@ -69,12 +74,13 @@ public class ExampleController {
         Map<String, String> params = Maps.newHashMap();
         params.put("fileId", fileId);
         params.put("host", callbackAddr);
-        params.put("fileExt", FilenameUtils.getExtension(getFilePath(fileId)));
+        String fileExt = FilenameUtils.getExtension(getFilePath(fileId, req));
+        params.put("fileExt", fileExt);
 
         String os = req.getParameter("os");
         if(os!=null){
             params.put("os", os);
-        }else if(getFilePath(fileId).endsWith(".xls")||getFilePath(fileId).equals(".xlsx")){
+        }else if(fileExt.endsWith("xls")||fileExt.equals("xlsx")){
             //如果是xls文档，默认用win转换平台
             params.put("os", SwopiUtil.OS_WIN);
         }
