@@ -1,21 +1,21 @@
 package com.etop.jansing.swopi.controller;
 
 import com.etop.example.ExampleController;
-import com.jansing.common.mapper.JsonMapper;
-import com.jansing.web.utils.HttpClientUtil;
 import com.etop.jansing.swopi.utils.SwopiUtil;
 import com.google.common.collect.Maps;
+import com.jansing.web.utils.HttpClientUtil;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,18 +37,13 @@ public class OfficeController {
      * map.put("BaseFileName", file.getName());
      * map.put("OwnerId", "jansing");
      * map.put("Version", "1.0");
-     * map.put("Size", SwopiUtil.getFileSize(in));
+     * map.put("Size", file.length());
      * map.put("SHA256", SwopiUtil.getFileSHA256(in));
-     *
-     * @param fileId
-     * @param resp
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException
      */
+    @ResponseBody
     @RequestMapping("/{fileId}")
-    public void fileInfo(@PathVariable String fileId, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Map<String, Object> map = new HashMap<>();
+    public Map<String, String> fileInfo(@PathVariable String fileId, HttpServletRequest req) throws IOException {
+        Map<String, String> map = new HashMap<>();
 
         InputStream in = null;
         try {
@@ -58,25 +53,15 @@ public class OfficeController {
             map.put("BaseFileName", file.getName());
             map.put("OwnerId", "jansing");
             map.put("Version", "1.0");
-            map.put("Size", SwopiUtil.getFileSize(in));
+            map.put("Size", String.valueOf(file.length()));
             map.put("SHA256", SwopiUtil.getFileSHA256(in));
-            resp.setStatus(HttpServletResponse.SC_OK);
-//            return map;
+            return map;
         } catch (FileNotFoundException e) {
             logger.error("convert server请求文件时文件不存在！");
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                ;
-            }
+            IOUtils.closeQuietly(in);
         }
-        PrintWriter writer = resp.getWriter();
-        writer.println(JsonMapper.getInstance().toJson(map));
-        resp.flushBuffer();
+        return null;
     }
 
     @RequestMapping("/{fileId}/contents")
@@ -96,28 +81,13 @@ public class OfficeController {
             logger.error("链接异常，请重试！");
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                ;
-            }
+            IOUtils.closeQuietly(in);
         }
     }
 
 
     /**
-     * 如果外网可以访问wopi服务器，并且允许暴露wopi服务器地址给浏览器，则可以访问这个方法。注意此时
-     * <p>
-     * 假设访问路径
-     * http://localhost:8080/image/login?username=aaa&password=ttt
-     * 则：
-     * getContextPath   /image
-     * getServletPath   /login
-     * getRequestURI    /image/login
-     * getRequestURL    http://localhost:8080/image/login
-     * getQueryString   username=aaa&password=ttt
+     * 如果允许暴露wopi服务器地址给浏览器，则可以访问这个方法
      *
      * @return
      */
@@ -131,8 +101,6 @@ public class OfficeController {
                 HttpClientUtil.getLocalServerPath(req));
     }
 
-
-    //    private static String owaServerPath = "http://officewebapps.etop.com";
     private static String callbackServletPath = "/wopi/files";
 
     private static String getOwaUrl(String fileId, String fileExt, String curContextPath) {
@@ -142,7 +110,6 @@ public class OfficeController {
         params.put("WOPISrc", fileInfoServletPath);
 
         String url = "";
-//        String url = owaServerPath;
         if (StringUtils.isBlank(fileExt)) {
             throw new IllegalArgumentException("文件格式为空！");
         }

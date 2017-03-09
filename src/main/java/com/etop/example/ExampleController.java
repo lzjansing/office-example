@@ -1,8 +1,8 @@
 package com.etop.example;
 
-import com.jansing.web.utils.HttpClientUtil;
 import com.etop.jansing.swopi.utils.SwopiUtil;
 import com.google.common.collect.Maps;
+import com.jansing.web.utils.HttpClientUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +62,7 @@ public class ExampleController {
         return getFilePath(i, null);
     }
 
-    public static String getFileRelativePath(String i, HttpServletRequest req){
+    public static String getFileRelativePath(String i, HttpServletRequest req) {
         String absoPath = getFilePath(i, req);
         return absoPath.substring(absoPath.indexOf("/upload"));
     }
@@ -78,10 +78,9 @@ public class ExampleController {
         params.put("fileExt", fileExt);
 
         String os = req.getParameter("os");
-        if(os!=null){
+        if (os != null) {
             params.put("os", os);
-        }else if(fileExt.endsWith("xls")||fileExt.equals("xlsx")){
-            //如果是xls文档，默认用win转换平台
+        } else if (fileExt.endsWith("xls") || fileExt.equals("xlsx")) {
             params.put("os", SwopiUtil.OS_WIN);
         }
         return "redirect:" + convertServletPath + HttpClientUtil.encodeParams(params);
